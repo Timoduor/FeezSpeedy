@@ -1,0 +1,29 @@
+﻿@model FeezSpeedy.Web.ViewModels.FeeRequestViewModel
+@{
+    ViewData["Title"] = "Apply Fee";
+}
+
+<h2>Apply Fee</h2>
+
+<form asp-action="ApplyFee" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="DependantId" />
+
+    <div class="mb-3">
+        <label asp-for="Amount"></label>
+        <input asp-for="Amount" class="form-control" />
+        <span asp-validation-for="Amount" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="InterestRate"></label>
+        <input asp-for="InterestRate" class="form-control" />
+        <span asp-validation-for="InterestRate" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success">Submit Fee Request</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

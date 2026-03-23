@@ -1,0 +1,86 @@
+﻿@model List<FeezSpeedy.Models.FeeRequest>
+
+@{
+    ViewData["Title"] = "Admin Dashboard - Fee Approvals";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success">@TempData["Message"]</div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<table class="table table-bordered table-hover mt-3">
+    <thead class="thead-dark">
+        <tr>
+            <th>#</th>
+            <th>Dependant</th>
+            <th>Parent</th>
+            <th>School</th>
+            <th>Amount</th>
+            <th>Total Payable</th>
+            <th>Interest Rate (%)</th>
+            <th>Status</th>
+            <th>Message</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            var fee = Model[i];
+            <tr>
+                <td>@(i + 1)</td>
+                <td>@fee.Dependant.FullName</td>
+                <td>@fee.Dependant.Parent.FullName</td>
+                <td>@fee.Dependant.School?.Name</td>
+                <td>@fee.Amount.ToString("C")</td>
+                <td>@fee.TotalPayable.ToString("C")</td>
+                <td>@fee.InterestRate</td>
+                <td>
+                    @switch (fee.Status)
+                    {
+                        case FeeStatus.Pending:
+                            <span class="badge bg-warning text-dark">Pending</span>
+                            ;
+                            break;
+                        case FeeStatus.Approved:
+                            <span class="badge bg-success">Approved</span>
+                            ;
+                            break;
+                        case FeeStatus.Declined:
+                            <span class="badge bg-danger">Declined</span>
+                            ;
+                            break;
+                    }
+                </td>
+                <td>@fee.ApprovalMessage</td>
+                <td>
+                    @if (fee.Status == FeeStatus.Pending)
+                    {
+                        <form asp-action="UpdateStatus" method="post" class="d-flex flex-column">
+                            <input type="hidden" name="feeRequestId" value="@fee.Id" />
+
+                            <input type="text" name="message" placeholder="Optional message" class="form-control mb-1" />
+
+                            <div class="d-flex gap-1">
+                                <button type="submit" name="status" value="Approved" class="btn btn-success btn-sm">Approve</button>
+                                <button type="submit" name="status" value="Declined" class="btn btn-danger btn-sm">Decline</button>
+                            </div>
+                        </form>
+                    }
+                    else
+                    {
+                        <span>N/A</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

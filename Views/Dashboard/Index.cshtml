@@ -1,0 +1,150 @@
+﻿@model FeezSpeedy.Web.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+<div class="container mt-4">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Success"]
+        </div>
+    }
+
+    <h2 class="mb-3">Dashboard</h2>
+    <p>Welcome, @User.Identity.Name!</p>
+
+    <div class="d-flex mb-4">
+        <a class="btn btn-primary me-2" asp-action="AddDependant">Add Dependant</a>
+        <a class="btn btn-success" asp-action="ApplyFee" asp-route-dependantId="@Model.Dependants.FirstOrDefault()?.Id ?? 0">Apply Fee</a>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card text-white bg-primary h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Total Dependants</h5>
+                    <h2>@Model.DependantsCount</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card text-white bg-success h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Fee Applications</h5>
+                    <h2>@Model.FeeRequestsCount</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card text-white bg-info h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Actions</h5>
+                    <a class="btn btn-light btn-sm" asp-action="AddDependant">Add Dependant</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dependants Grid -->
+    <div class="row">
+        @foreach (var d in Model.Dependants)
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">@d.FullName</h5>
+                        <p class="card-text">
+                            <strong>Admission #:</strong> @d.AdmissionNumber <br />
+                            <strong>Class:</strong> @d.ClassLevel <br />
+                            <strong>School:</strong> @d.School?.Name
+                        </p>
+                        <a class="btn btn-success btn-sm" asp-action="ApplyFee" asp-route-dependantId="@d.Id">Apply Fee</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <h3>Fee Requests</h3>
+    <table class="table table-sm">
+        <thead>
+            <tr>
+                <th>Dependant</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Payment Method</th>
+                <th>Paid?</th>
+                <th>Approval Message</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var f in Model.FeeRequests)
+            {
+                <tr>
+                    <td>@f.Dependant.FullName</td>
+                    <td>@f.TotalPayable.ToString("C")</td>
+                    <td>@f.Status</td>
+                    <td>@f.PaymentMethod?.ToString() ?? "N/A"</td>
+                    <td>@(f.IsPaid ? $"Yes ({f.PaidAt:dd-MMM-yyyy})" : "No")</td>
+                    <td>@f.ApprovalMessage</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <h4 class="text-danger">
+        Outstanding Balance: KES @Model.OutstandingBalance.ToString("C")
+    </h4>
+
+    <hr />
+
+    <!-- Loan Preview Table -->
+    <h3>Loan Preview / Repayment Schedule</h3>
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Dependant</th>
+                <th>Total Payable</th>
+                <th>Monthly Repayment</th>
+                <th>Payoff Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.FeeRequests.Any())
+            {
+                @foreach (var d in Model.Dependants)
+                {
+                    var latestFee = Model.FeeRequests
+                    .Where(f => f.DependantId == d.Id)
+                    .OrderByDescending(f => f.CreatedAt)
+                    .FirstOrDefault();
+
+                    if (latestFee != null)
+                    {
+                        var interestAmount = latestFee.Amount * (latestFee.InterestRate / 100) * (latestFee.DurationMonths / 12m);
+                        var totalPayable = latestFee.Amount + interestAmount;
+                        var monthlyRepayment = totalPayable / latestFee.DurationMonths;
+                        var payoffDate = DateTime.Today.AddMonths(latestFee.DurationMonths);
+
+                        <tr>
+                            <td>@d.FullName</td>
+                            <td>@totalPayable.ToString("C")</td>
+                            <td>@monthlyRepayment.ToString("C")</td>
+                            <td>@payoffDate.ToString("MMMM yyyy")</td>
+                        </tr>
+                    }
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4" class="text-center">No fee requests to preview</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>

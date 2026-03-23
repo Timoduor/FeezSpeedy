@@ -1,0 +1,41 @@
+﻿@model List<FeezSpeedy.Models.FeeRequest>
+@{
+    ViewData["Title"] = "Fee Approvals";
+}
+
+<h2>Pending Fee Requests</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Dependant</th>
+            <th>Parent</th>
+            <th>Amount</th>
+            <th>Total Payable</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.Dependant.FullName</td>
+                <td>@r.Dependant.Parent.FullName</td>
+                <td>@r.Amount</td>
+                <td>@r.TotalPayable</td>
+                <td>@r.Status</td>
+                <td>
+                    <form asp-action="ChangeFeeStatus" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@r.Id" />
+                        <select name="status" class="form-select d-inline w-auto">
+                            <option value="Approved">Approve</option>
+                            <option value="Rejected">Reject</option>
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,42 @@
+﻿@model List<RepaymentSchedule>
+@{
+    var methods = ViewBag.PaymentOptions as List<PaymentOption>;
+}
+
+<h2>Repayment Schedule</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Due Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Pay</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var r in Model)
+        {
+            <tr>
+                <td>@r.DueDate.ToShortDateString()</td>
+                <td>@r.DueAmount</td>
+                <td>@(r.IsPaid ? "Paid" : "Pending")</td>
+                <td>
+                    @if (!r.IsPaid)
+                    {
+                        <form method="post" asp-action="Pay">
+                            <input type="hidden" name="scheduleId" value="@r.Id" />
+                            <select name="method" class="form-select">
+                                @foreach (var m in methods!)
+                                {
+                                    <option value="@m.Name">@m.Name</option>
+                                }
+                            </select>
+                            <button class="btn btn-primary btn-sm mt-1">Pay</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,46 @@
+﻿@model FeezSpeedy.Web.ViewModels.DependantViewModel
+@{
+    ViewData["Title"] = "Add Dependant";
+}
+
+<h2>Add Dependant</h2>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+
+    <div class="mb-3">
+        <label asp-for="FullName" class="form-label"></label>
+        <input asp-for="FullName" class="form-control" placeholder="Enter full name" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="AdmissionNumber" class="form-label"></label>
+        <input asp-for="AdmissionNumber" class="form-control" placeholder="Enter admission number" />
+        <span asp-validation-for="AdmissionNumber" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ClassLevel" class="form-label"></label>
+        <input asp-for="ClassLevel" class="form-control" placeholder="Enter class level" />
+        <span asp-validation-for="ClassLevel" class="text-danger"></span>
+    </div>
+
+    <!-- School input: dropdown + manual input -->
+    <div class="mb-3">
+        <label for="schoolInput" class="form-label">School</label>
+        <input type="text" id="schoolInput" name="SchoolName" class="form-control" placeholder="Type or select a school" list="schoolsList" />
+        <datalist id="schoolsList">
+            @foreach (var school in ViewBag.Schools)
+            {
+                <option value="@school.Name"></option>
+            }
+        </datalist>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add Dependant</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

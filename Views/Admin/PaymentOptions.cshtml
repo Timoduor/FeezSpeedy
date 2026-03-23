@@ -1,0 +1,35 @@
+﻿@using FeezSpeedy.Models
+@model List<PaymentOption>
+
+<h2>Payment Options</h2>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model)
+        {
+            <tr>
+                <td>@p.Name</td>
+                <td>
+                    <span class="badge @(p.IsActive ? "bg-success" : "bg-danger")">
+                        @(p.IsActive ? "Active" : "Disabled")
+                    </span>
+                </td>
+                <td>
+                    <form method="post" asp-action="Toggle">
+                        <input type="hidden" name="id" value="@p.Id" />
+                        <button type="submit" class="btn btn-warning btn-sm">
+                            Toggle
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

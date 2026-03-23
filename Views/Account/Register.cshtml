@@ -1,0 +1,45 @@
+﻿@model FeezSpeedy.Web.ViewModels.RegisterViewModel
+
+<h2>Register</h2>
+
+<form method="post">
+    <div class="mb-2">
+        <input asp-for="FullName" class="form-control" placeholder="Full Name" />
+        <span asp-validation-for="FullName" class="text-danger"></span>
+    </div>
+
+    <div class="mb-2">
+        <input asp-for="Email" class="form-control" placeholder="Email" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+
+    <div class="mb-2">
+        <input asp-for="NationalId" class="form-control" placeholder="National ID" />
+        <span asp-validation-for="NationalId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-2">
+        <input asp-for="PhoneNumber" class="form-control" placeholder="Phone Number" />
+        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <input asp-for="Password" type="password" class="form-control" placeholder="Password" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+    </div>
+
+    <!-- BUTTON IS HERE 👇 -->
+    <button type="submit" class="btn btn-primary w-100">
+        Register
+    </button>
+</form>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <ul class="text-danger mt-3">
+        @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+        {
+            <li>@error.ErrorMessage</li>
+        }
+    </ul>
+}

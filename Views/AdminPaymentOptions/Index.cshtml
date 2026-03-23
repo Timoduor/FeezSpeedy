@@ -1,0 +1,53 @@
+﻿@model IEnumerable<FeezSpeedy.Models.FeeRequest>
+
+@{
+    ViewData["Title"] = "Admin Disbursement";
+}
+
+<h2>Admin Disbursement</h2>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Parent</th>
+            <th>Dependant</th>
+            <th>Amount</th>
+            <th>Payment Method</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.ParentId</td>
+                <td>@item.Dependant?.FullName</td>
+                <td>@item.TotalPayable.ToString("C")</td>
+                <td>@item.PaymentMethod</td>
+                <td>@(item.IsDisbursed ? "Disbursed" : "Pending")</td>
+                <td>
+                    @if (!item.IsDisbursed)
+                    {
+                        <form asp-action="Disburse" method="post">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <select name="method" class="form-select form-select-sm mb-1">
+                                @foreach (var opt in (IEnumerable<PaymentOption>)ViewBag.PaymentOptions)
+                                {
+                                    <option value="@opt.Name">@opt.Name</option>
+                                }
+                            </select>
+                            <button type="submit" class="btn btn-success btn-sm">
+                                Mark Disbursed
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span class="text-success">✔ Done</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
